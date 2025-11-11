@@ -1,4 +1,4 @@
-all:
+all: sort_tracking.c util.h
 	gcc sort_tracking.c -o sort_tracking_O0 -O0 -lpapi
 	gcc sort_tracking.c -o sort_tracking_O1 -O1 -lpapi
 	gcc sort_tracking.c -o sort_tracking_O2 -O2 -lpapi
