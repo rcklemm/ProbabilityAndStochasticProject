@@ -1,20 +1,94 @@
 #include "util.h"
+#include <time.h>
 
-int main() {
+int* read_list(const char* filename, int *outsz) {
+    FILE *list_file = fopen(filename, "r");
+    int retval;
+
+    int num_entries;    
+    if ((retval = fscanf(list_file, "%d", &num_entries)) != 1) {
+        printf("File parsing failed!\n");
+        exit(1);
+    }
+    *outsz = num_entries;
+
+    int* arr = malloc(sizeof(int)*num_entries);
+    for (int i = 0; i < num_entries; i++) {
+        if ((retval = fscanf(list_file, "%d", &arr[i])) != 1) {
+            printf("File parsing failed!\n");
+        }
+    }
+
+    return arr;
+}
+
+void swap(int *a, int *b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+int partition(int arr[], int low, int high) {
+    int pivot = arr[low];
+    int i = low;
+    int j = high;
+    
+    while (i < j) {
+        while (arr[i] <= pivot && i <= high - 1) i++;
+
+        while (arr[j] > pivot && j >= low + 1) j--;
+
+        if (i < j) swap(&arr[i], &arr[j]);
+    }
+    
+    swap(&arr[low], &arr[j]);
+
+    return j;
+}
+
+void quick_sort(int arr[], int low, int high, int depth) {
+    if (low < high) {
+        start_instr_measure();
+        int pi = partition(arr, low, high);
+        long long inst_count = stop_instr_measure();        
+        printf("%d depth: low=%d, high=%d, partition instructions=%lld\n", depth, low, high, inst_count);
+    
+        quick_sort(arr, low, pi - 1, depth + 1);
+        quick_sort(arr, pi + 1, high, depth + 1);
+    }
+}
+
+void print_arr(const char* msg, int arr[], size_t len) {
+    printf("%s: ", msg);
+    printf("[");
+    for (size_t i = 0; i < len; i++) {
+        printf("%d", arr[i]);
+        if (i != len - 1) {
+            printf(", ");
+        }
+    }
+    printf("]\n");
+}
+
+int main(int argc, char **argv) {
+    if (argc < 2) {
+        printf("USAGE: %s <listfile>\n", argv[0]);
+        return 1;
+    }
+
     perf_cnt_init();
     
-    start_instr_measure();
-    // ---- measure ----
-    for (volatile int i = 0; i < 100000; i++);
-    // -----------------
-    long long inst_count = stop_instr_measure();
-    printf("1 Executed: %lld instructions\n", inst_count);
-    
+    srand(time(NULL));
 
-    start_instr_measure();
-    for (volatile int i = 0; i < 10000; i++);
-    inst_count = stop_instr_measure();
-    printf("2 Executed: %lld instructions\n", inst_count);
+    int arrsz;
+    int *to_sort = read_list(argv[1], &arrsz);
+    print_arr("ORIGINAL ARRAY", to_sort, arrsz);
+
+    quick_sort(to_sort, 0, arrsz - 1, 0);    
+
+    print_arr("SORTED ARRAY", to_sort, arrsz);
+
+    perf_cnt_shutdown();
 
     return 0;
 }
