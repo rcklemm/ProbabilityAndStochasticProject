@@ -18,14 +18,31 @@ int* read_list(const char* filename, int *outsz) {
             printf("File parsing failed!\n");
         }
     }
+    fclose(list_file);
 
     return arr;
+}
+
+void dump_list(const char* filename, int *arr, int size) {
+    FILE *list_file = fopen(filename, "w");
+    
+    fprintf(list_file, "%d\n", size);
+
+    for (int i = 0; i < size; i++) {
+        fprintf(list_file, "%d ", arr[i]);
+    }
+
+    fclose(list_file);
+    
+    return;
 }
 
 void swap(int *a, int *b) {
     int temp = *a;
     *a = *b;
     *b = temp;
+
+    return;
 }
 
 int partition(int arr[], int low, int high) {
@@ -71,8 +88,8 @@ void print_arr(const char* msg, int arr[], size_t len) {
 }
 
 int main(int argc, char **argv) {
-    if (argc < 2) {
-        printf("USAGE: %s <listfile>\n", argv[0]);
+    if (argc < 3) {
+        printf("USAGE: %s <infile> <outfile>\n", argv[0]);
         return 1;
     }
 
@@ -82,12 +99,14 @@ int main(int argc, char **argv) {
 
     int arrsz;
     int *to_sort = read_list(argv[1], &arrsz);
-    print_arr("ORIGINAL ARRAY", to_sort, arrsz);
+    //print_arr("ORIGINAL ARRAY", to_sort, arrsz);
 
     quick_sort(to_sort, 0, arrsz - 1, 0);    
-
-    print_arr("SORTED ARRAY", to_sort, arrsz);
-
+    
+    dump_list(argv[2], to_sort, arrsz);
+    //print_arr("SORTED ARRAY", to_sort, arrsz);
+    
+    free(to_sort);
     perf_cnt_shutdown();
 
     return 0;
