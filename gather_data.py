@@ -31,10 +31,13 @@ def main() -> None:
             print(f"output:\n{out}")
             print()
             os.remove('tmp.list.txt')
+            os.remove('sorted.list.txt')
 
     return
 
 
 if __name__ == '__main__':
-    main()
+    #main()
+    build_random_list(2**22, 'big.list.txt')
+    get_output('big.list.txt', 1)
 

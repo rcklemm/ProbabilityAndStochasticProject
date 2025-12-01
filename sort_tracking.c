@@ -45,19 +45,32 @@ void swap(int *a, int *b) {
     return;
 }
 
-int partition(int arr[], int low, int high) {
+int partition(int arr[], int low, int high, int *cmp_cnt, int *swp_cnt) {
+    *cmp_cnt = 0;
+    *swp_cnt = 0;
     int pivot = arr[low];
     int i = low;
     int j = high;
     
     while (i < j) {
-        while (arr[i] <= pivot && i <= high - 1) i++;
+        (*cmp_cnt)++;
+        while (arr[i] <= pivot && i <= high - 1) {
+            (*cmp_cnt)++; 
+            i++;
+        }
 
-        while (arr[j] > pivot && j >= low + 1) j--;
+        while (arr[j] > pivot && j >= low + 1) {
+            (*cmp_cnt)++;
+            j--;
+        }
 
-        if (i < j) swap(&arr[i], &arr[j]);
+        if (i < j) {
+            (*swp_cnt)++;
+            swap(&arr[i], &arr[j]);
+        }
     }
     
+    (*swp_cnt)++;
     swap(&arr[low], &arr[j]);
 
     return j;
@@ -66,9 +79,10 @@ int partition(int arr[], int low, int high) {
 void quick_sort(int arr[], int low, int high, int depth) {
     if (low < high) {
         start_instr_measure();
-        int pi = partition(arr, low, high);
+        int swp_cnt, cmp_cnt;
+        int pi = partition(arr, low, high, &swp_cnt, &cmp_cnt);
         long long inst_count = stop_instr_measure();        
-        printf("%d depth: low=%d, high=%d, partition instructions=%lld\n", depth, low, high, inst_count);
+        printf("%d depth: low=%d, high=%d, partition instructions=%lld, swap_count=%d, compare_count=%d\n", depth, low, high, inst_count, swp_cnt, cmp_cnt);
     
         quick_sort(arr, low, pi - 1, depth + 1);
         quick_sort(arr, pi + 1, high, depth + 1);
